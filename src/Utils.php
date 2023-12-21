@@ -88,11 +88,12 @@ final class Utils
         $handler = null;
 
         if (\defined('CURLOPT_CUSTOMREQUEST')) {
-            if (\function_exists('curl_multi_exec') && \function_exists('curl_exec')) {
+            $use_curl_multi = \function_exists('curl_multi_exec') && !(\defined('GUZZLE_DISABLE_CURL_MULTI') && \GUZZLE_DISABLE_CURL_MULTI);
+            if ($use_curl_multi && \function_exists('curl_exec')) {
                 $handler = Proxy::wrapSync(new CurlMultiHandler(), new CurlHandler());
             } elseif (\function_exists('curl_exec')) {
                 $handler = new CurlHandler();
-            } elseif (\function_exists('curl_multi_exec')) {
+            } elseif ($use_curl_multi) {
                 $handler = new CurlMultiHandler();
             }
         }
